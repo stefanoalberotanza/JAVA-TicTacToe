@@ -10,49 +10,28 @@ public class TicTacToe {
     private static final char PLAYER_X = 'X';
     private static final char PLAYER_O = 'O';
 
+    private static final Scanner scanner = new Scanner(System.in);
+
     // The current player
     private static char currentPlayer = PLAYER_X;
 
     public static void main(String[] args) {
         // Initialize the grid with empty spaces
+        setup();
+
+        // Start the game loop
+        game();
+
+
+    }
+
+
+    //setup game
+    private static void setup() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 grid[i][j] = ' ';
             }
-        }
-
-        // Start the game loop
-        while (true) {
-            // Print the grid
-            printGrid();
-
-            // Prompt the current player to make a move
-            System.out.println("Player " + currentPlayer + ", enter your move (row, col): ");
-            Scanner scanner = new Scanner(System.in);
-            int row = scanner.nextInt();
-            int col = scanner.nextInt();
-
-            // Update the grid with the player's move
-            grid[row][col] = currentPlayer;
-
-            // Check if the game is over
-            if (isGameOver()) {
-                // Print the final grid
-                printGrid();
-
-                // Print the winner (if any)
-                if (hasWinner()) {
-                    System.out.println("Player " + currentPlayer + " wins!");
-                } else {
-                    System.out.println("It's a tie!");
-                }
-
-                // End the game loop
-                break;
-            }
-
-            // Switch to the other player
-            currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
         }
     }
 
@@ -69,6 +48,65 @@ public class TicTacToe {
             if (i < 2) {
                 System.out.println("-+-+-");
             }
+        }
+    }
+
+
+    //Engine to handle game rounds
+    private static void game(){
+
+            while (true) {
+                // Print the grid
+                printGrid();
+
+                // Prompt the current player to make a move
+                System.out.println("Player " + currentPlayer + ", enter your move (row, col): ");
+                Scanner scanner = new Scanner(System.in);
+                int row = scanner.nextInt();
+                int col = scanner.nextInt();
+
+                // Update the grid with the player's move
+                grid[row][col] = currentPlayer;
+
+                // Check if the game is over
+                if (isGameOver()) {
+                    // Print the final grid
+                    printGrid();
+
+                    // Print the winner (if any)
+                    if (hasWinner()) {
+                        System.out.println("Player " + currentPlayer + " wins!");
+                    } else {
+                        System.out.println("It's a tie!");
+                    }
+
+                    // End the game loop
+                    break;
+                }
+
+            // Switch to the other player
+            currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
+            }
+
+        //Asking for new game
+        newGame();
+    }
+
+    private static void newGame() {
+        System.out.print("""
+        
+        Do you want play again?
+            
+            1 - Yes
+            2 - No 
+            
+        """);
+
+        if(scanner.nextInt()==1){
+            setup();
+            game();
+        }else {
+            System.out.print("Bye, thanks for playing!");
         }
     }
 
