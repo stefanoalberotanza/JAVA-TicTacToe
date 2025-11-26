@@ -1,19 +1,26 @@
 
+import model.Board;
+import model.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
+
+import static model.Board.*;
 
 public class TicTacToe {
 
-    // The grid where the game is played, represented as a 2D array
-    private static char[][] grid = new char[3][3];
 
     // The players, represented as X and O
     private static final char PLAYER_X = 'X';
     private static final char PLAYER_O = 'O';
 
+    private static List<Player> players;
+
     private static final Scanner scanner = new Scanner(System.in);
 
     // The current player
-    private static char currentPlayer = PLAYER_X;
 
     public static void main(String[] args) {
         // Initialize the grid with empty spaces
@@ -21,57 +28,27 @@ public class TicTacToe {
 
         // Start the game loop
         game();
-
-
     }
-
-
-    //setup game
-    private static void setup() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                grid[i][j] = ' ';
-            }
-        }
-    }
-
-    // Print the grid to the console
-    private static void printGrid() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(grid[i][j]);
-                if (j < 2) {
-                    System.out.print("|");
-                }
-            }
-            System.out.println();
-            if (i < 2) {
-                System.out.println("-+-+-");
-            }
-        }
-    }
-
 
     //Engine to handle game rounds
     private static void game(){
 
+        int i = 0;
             while (true) {
                 // Print the grid
-                printGrid();
+                Board.printGrid();
 
                 // Prompt the current player to make a move
-                System.out.println("Player " + currentPlayer + ", enter your move (row, col): ");
-                Scanner scanner = new Scanner(System.in);
-                int row = scanner.nextInt();
-                int col = scanner.nextInt();
+                Player currentPlayer = players.get(i);
 
+                int[] rowCol = currentPlayer.makeMove(scanner, Board.getGrid());
                 // Update the grid with the player's move
-                grid[row][col] = currentPlayer;
+                Board.update(currentPlayer, rowCol);
 
                 // Check if the game is over
                 if (isGameOver()) {
                     // Print the final grid
-                    printGrid();
+                    Board.printGrid();
 
                     // Print the winner (if any)
                     if (hasWinner()) {
@@ -85,7 +62,7 @@ public class TicTacToe {
                 }
 
             // Switch to the other player
-            currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
+                i= (i+1)%2;
             }
 
         //Asking for new game
@@ -107,6 +84,56 @@ public class TicTacToe {
             game();
         }else {
             System.out.print("Bye, thanks for playing!");
+        }
+    }
+
+    //setup game
+    public static void setup() {
+        Board.clear();
+        players = new ArrayList<>();
+
+        System.out.println("What game do u want play?\n" +
+                "1 - Player vs AI\n" +
+                "2 - Player vs Player\n" +
+                "3 - AI vs AI \n");
+
+        Player playerX = new Player(PLAYER_X);
+        Player playerO = new Player(PLAYER_O);
+
+        int mode = scanner.nextInt();
+        if(mode==1) {
+            System.out.println("What game do u want play?\n" +
+                    "1 - first as X\n" +
+                    "2 - second as O\n" +
+                    "3 - random ");
+
+            int order = scanner.nextInt();
+            if(order==1) {
+                playerX.ai = false;
+                playerO.ai = true;
+            }else if(order==2){
+                playerX.ai = true;
+                playerO.ai = false;
+
+            }else{
+                Random random = new Random();
+                boolean ai = random.nextInt(1) > 0.5;
+                playerX.ai = ai;
+                playerO.ai = !ai;
+            }
+
+            players.add(playerX);
+            players.add(playerO);
+        }else if(mode==2) {
+            playerX.ai = false;
+            playerO.ai = false;
+            players.add(playerX);
+            players.add(playerO);
+        }else {
+            playerX.ai = true;
+            playerO.ai = true;
+            players.add(playerX);
+            players.add(playerO);
         }
     }
 
@@ -140,35 +167,5 @@ public class TicTacToe {
         return false;
     }
 
-    // Check if the given row has a winning combination
-    private static boolean isRowWin(int row) {
-        return (grid[row][0] != ' ' && grid[row][0] == grid[row][1] && grid[row][1] == grid[row][2]);
-    }
 
-    // Check if the given column has a winning combination
-    private static boolean isColWin(int col) {
-        return (grid[0][col] != ' ' && grid[0][col] == grid[1][col] && grid[1][col] == grid[2][col]);
-    }
-
-    // Check if the first diagonal has a winning combination
-    private static boolean isDiag1Win() {
-        return (grid[0][0] != ' ' && grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2]);
-    }
-
-    // Check if the second diagonal has a winning combination
-    private static boolean isDiag2Win() {
-        return (grid[0][2] != ' ' && grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0]);
-    }
-
-    // Check if there are no more empty spaces in the grid
-    private static boolean isFull() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (grid[i][j] == ' ') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 }
